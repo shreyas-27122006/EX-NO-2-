@@ -35,9 +35,108 @@ STEP-5: Display the obtained cipher text.
 
 
 Program:
+~~~
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 
+int main() {
+    char key[100], text[100], matrix[5][5];
+    char used[26] = {0};
+    int i, j, k = 0, r1, c1, r2, c2;
 
+    printf("Enter keyword: ");
+    scanf("%s", key);
 
+    printf("Enter plaintext: ");
+    scanf("%s", text);
 
+    // Create 5x5 key matrix
+    for (i = 0; key[i] != '\0'; i++) {
+        char ch = tolower(key[i]);
 
+        if (ch == 'j')
+            ch = 'i';
+
+        if (ch >= 'a' && ch <= 'z' && !used[ch - 'a']) {
+            matrix[k / 5][k % 5] = ch;
+            used[ch - 'a'] = 1;
+            k++;
+        }
+    }
+
+    for (i = 0; i < 26; i++) {
+        if (i == ('j' - 'a'))
+            continue;
+
+        if (!used[i]) {
+            matrix[k / 5][k % 5] = 'a' + i;
+            k++;
+        }
+    }
+
+    // Prepare plaintext
+    char plain[200], cipher[200];
+    int n = 0;
+
+    for (i = 0; text[i] != '\0'; i++) {
+        char ch = tolower(text[i]);
+
+        if (ch == 'j')
+            ch = 'i';
+
+        if (ch < 'a' || ch > 'z')
+            continue;
+
+        plain[n++] = ch;
+    }
+
+    plain[n] = '\0';
+
+    // Encrypt plaintext in pairs
+    int p = 0, c = 0;
+
+    while (p < n) {
+        char a = plain[p++];
+        char b;
+
+        if (p == n || a == plain[p]) {
+            b = 'x';
+        } else {
+            b = plain[p++];
+        }
+
+        for (i = 0; i < 5; i++) {
+            for (j = 0; j < 5; j++) {
+                if (matrix[i][j] == a) {
+                    r1 = i;
+                    c1 = j;
+                }
+                if (matrix[i][j] == b) {
+                    r2 = i;
+                    c2 = j;
+                }
+            }
+        }
+
+        if (r1 == r2) {
+            cipher[c++] = matrix[r1][(c1 + 1) % 5];
+            cipher[c++] = matrix[r2][(c2 + 1) % 5];
+        } else if (c1 == c2) {
+            cipher[c++] = matrix[(r1 + 1) % 5][c1];
+            cipher[c++] = matrix[(r2 + 1) % 5][c2];
+        } else {
+            cipher[c++] = matrix[r1][c2];
+            cipher[c++] = matrix[r2][c1];
+        }
+    }
+
+    cipher[c] = '\0';
+
+    printf("Cipher text: %s\n", cipher);
+
+    return 0;
+}
+~~~
 Output:
+<img width="1917" height="668" alt="image" src="https://github.com/user-attachments/assets/827c888a-d802-403f-888c-db947c4dce3c" />
